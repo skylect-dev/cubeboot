@@ -1,4 +1,16 @@
-# cubeboot
+# CubebootEX
+
+**CubebootEX** is a modernized, actively maintained fork of the original CubeBoot project.
+
+### What's new in CubebootEX?
+- **Modernized Toolchain**: Fully upgraded to compile against the latest `devkitPPC` (libogc) and GCC toolchains.
+- **Native Hardware Fixes**: Fixed severe memory relocation bugs that caused crashes and graphical glitches on native Gamecube hardware (especially DOL-101 models).
+- **Automated CI/CD**: Implemented robust GitHub Actions workflows that automatically build and package releases (`.dol`, `boot.iso`, and PicoBoot `.uf2`) on every tag.
+- **100% Backwards Compatible**: Internal filenames (like `cubeboot.ini` and `cubeboot.dol`) remain identical to the original project to ensure existing SD card setups and tutorials do not break!
+
+---
+
+*(Original README below)*
 
 This project provides a program called cubeboot which is able to play the GameCube
 boot animation. This is useful for some modchips like PicoBoot which skip the boot
