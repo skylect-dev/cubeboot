@@ -28,5 +28,5 @@ void prog_halt(char *msg) {
 #ifdef VIDEO_ENABLE
     VIDEO_WaitVSync();
 #endif
-    ppchalt();
+    while(1);
 }

@@ -60,7 +60,7 @@ void _main() {
 		gprintf("decompression failed (%d)\n", res);
         // u32 *buf = (u32*)dol_buf;
         // gprintf("out = %08x %08x\n", buf[0], buf[1]);
-		ppchalt();
+		while(1);
 	}
 
 	gprintf("decompressed %u bytes\n", outlen);
