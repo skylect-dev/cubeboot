@@ -17,6 +17,7 @@ jobs:
         run: |
           git clone -b force-early-boot --single-branch https://github.com/OffBroadway/gc-boot-tools.git
           cd gc-boot-tools
+          sed -i '1i void _memset(void* s, int c, int count);' ppc/apploader/apploader.c
           (cd ppc/apploader; make)
           (cd mkgbi; make)
           ls mkgbi/gbi.hdr
