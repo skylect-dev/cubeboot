@@ -21,8 +21,7 @@ char *boot_paths[] = {
     "/AUTOEXEC.DOL", // used by ActionReplay
 };
 
-extern const void _start;
-extern const void _edata;
+
 
 u8 *dol_buf;
 

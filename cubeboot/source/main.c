@@ -45,26 +45,15 @@ static char stringBuffer[255];
 ATTRIBUTE_ALIGN(32) u8 current_dol_buf[750 * 1024];
 u32 current_dol_len;
 
-extern const u8 _start[] __attribute__((weak));
-extern const u8 __start[] __attribute__((weak));
-extern const u8 __executable_start[] __attribute__((weak));
-
-extern const u8 _edata[] __attribute__((weak));
-extern const u8 __data_end[] __attribute__((weak));
-extern const u8 __bss_start[] __attribute__((weak));
+extern const u8 __app_start[];
+extern const u8 __bss_start[];
 
 static inline const void* get_start_addr() {
-    if (_start) return _start;
-    if (__start) return __start;
-    if (__executable_start) return __executable_start;
-    return (void*)BS2_BASE_ADDR;
+    return __app_start;
 }
 
 static inline const void* get_end_data_addr() {
-    if (_edata) return _edata;
-    if (__data_end) return __data_end;
-    if (__bss_start) return __bss_start;
-    return (void*)SYS_GetArenaLo();
+    return __bss_start;
 }
 
 u32 can_load_dol = 0;
