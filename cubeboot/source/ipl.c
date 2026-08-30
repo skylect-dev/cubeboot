@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "sd.h"
 
@@ -84,6 +85,26 @@ extern u64 gettime(void);
 extern u32 diff_msec(s64 start,s64 end);
 
 static bool valid = false;
+
+void apply_additional_patches(void) {
+    if (bios_index < 0)
+        return;
+
+    // disable exi probe for sd slot
+    const char* dev = get_current_dev_name(); 
+    if (dev != NULL) {
+        if (strcmp(dev, "sda") == 0) {
+            u32 probe_card_0[] = { 0x8131b1c4, 0x8131b8f0, 0x8131bc88, 0x8131bca0, 0x8131c29c, 0x8131b81c, 0x8131c3dc };
+            *(u32*)probe_card_0[bios_index] = 0x38600000; // li r3, 0
+        } else if (strcmp(dev, "sdb") == 0) {
+            u32 probe_card_1[] = { 0x8131b274, 0x8131b9a0, 0x8131bd38, 0x8131bd50, 0x8131c34c, 0x8131b8cc, 0x8131c48c };
+            *(u32*)probe_card_1[bios_index] = 0x38600000; // li r3, 0
+        } else if (strcmp(dev, "sd2") == 0) {
+            u32 init_ad16_addr[] = { 0x81335f54, 0x8135b9b4, 0x8136572c, 0x81365890, 0x8135ef94, 0x8135b8d4, 0x81368c08 };
+            *(u32*)init_ad16_addr[bios_index] = 0x4e800020; // blr
+        }
+    }
+}
 
 void load_ipl() {
     if (is_dolphin()) {
@@ -166,6 +187,8 @@ void load_ipl() {
 ipl_loaded:
     current_bios = &bios_table[bios_index];
     iprintf("IPL %s loaded...\n", current_bios->name);
+
+    apply_additional_patches();
 }
 
 // #ifndef DISABLE_SDA_CHECK
