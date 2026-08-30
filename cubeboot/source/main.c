@@ -9,6 +9,7 @@
 
 #include <asndlib.h>
 extern void __lwp_thread_stopmultitasking(void (*)(void));
+#include <ogc/lwp_watchdog.h>
 
 #include <stddef.h>
 #include <stdint.h>
