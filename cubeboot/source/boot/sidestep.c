@@ -11,7 +11,7 @@
 #include <ogc/aram.h>
 #include <ogc/cache.h>
 #include <ogc/gx.h>
-#include <ogc/lwp_threads.h>
+extern void __lwp_thread_stopmultitasking(void (*)(void));
 #include <ogc/system.h>
 
 #include "sidestep.h"
