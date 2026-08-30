@@ -8,8 +8,7 @@
 #include <unistd.h>
 
 #include <asndlib.h>
-#include <ogc/lwp_threads.h>
-#include <ogc/lwp_watchdog.h>
+extern void __lwp_thread_stopmultitasking(void (*)(void));
 
 #include <stddef.h>
 #include <stdint.h>
