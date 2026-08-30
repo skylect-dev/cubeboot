@@ -12,7 +12,11 @@ jobs:
           apt-get update && apt-get install -y genisoimage nodejs build-essential gcc-arm-none-eabi python3-pip
           pip3 install --break-system-packages -r patches/scripts/requirements.txt || pip3 install -r patches/scripts/requirements.txt
       - name: Dump gamecube linker script
-        run: cat /opt/devkitpro/devkitPPC/powerpc-eabi/lib/gamecube.ld || echo "Not found"
+        run: |
+          echo 'int main() { return 0; }' > test.c
+          powerpc-eabi-gcc test.c -o test.elf || echo "Compile failed"
+          powerpc-eabi-nm test.elf | grep -iE "(start|data|end|bss)" || echo "No symbols"
+
       - name: Build cubeboot
         run: cd entry; make clean && make
       - name: Build apploader
