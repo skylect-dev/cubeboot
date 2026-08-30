@@ -28,7 +28,9 @@ jobs:
       - name: Build PicoBoot
         run: |
           git clone https://github.com/webhdx/PicoBoot.git
-          cd PicoBoot; env PICO_SDK_FETCH_FROM_GIT=1 cmake .
+          cd PicoBoot
+          git checkout 4bc1bfd22d8e9ce0a0fcd57e77b50801565566ed
+          env PICO_SDK_FETCH_FROM_GIT=1 cmake .
           ./process_ipl.py ../entry/entry.dol src/ipl.h
           make
       - name: Rename Artifacts
