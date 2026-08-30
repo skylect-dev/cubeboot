@@ -45,9 +45,27 @@ static char stringBuffer[255];
 ATTRIBUTE_ALIGN(32) u8 current_dol_buf[750 * 1024];
 u32 current_dol_len;
 
-extern const void _start;
-extern const void _edata;
-extern const void _end;
+extern const u8 _start[] __attribute__((weak));
+extern const u8 __start[] __attribute__((weak));
+extern const u8 __executable_start[] __attribute__((weak));
+
+extern const u8 _edata[] __attribute__((weak));
+extern const u8 __data_end[] __attribute__((weak));
+extern const u8 __bss_start[] __attribute__((weak));
+
+static inline const void* get_start_addr() {
+    if (_start) return _start;
+    if (__start) return __start;
+    if (__executable_start) return __executable_start;
+    return (void*)BS2_BASE_ADDR;
+}
+
+static inline const void* get_end_data_addr() {
+    if (_edata) return _edata;
+    if (__data_end) return __data_end;
+    if (__bss_start) return __bss_start;
+    return (void*)SYS_GetArenaLo();
+}
 
 u32 can_load_dol = 0;
 
@@ -59,8 +77,13 @@ void __SYS_PreInit() {
 
     SYS_SetArenaHi((void*)BS2_BASE_ADDR);
 
-    current_dol_len = &_edata - &_start;
-    memcpy(current_dol_buf, &_start, current_dol_len);
+    const void *start_addr = get_start_addr();
+    const void *end_addr = get_end_data_addr();
+
+    if (start_addr && end_addr) {
+        current_dol_len = (u32)end_addr - (u32)start_addr;
+        memcpy(current_dol_buf, start_addr, current_dol_len);
+    }
 }
 
 int main() {
@@ -343,9 +366,9 @@ int main() {
     }
 
     // load current program
-    prog_entrypoint = (u32)&_start;
+    prog_entrypoint = (u32)get_start_addr();
     prog_src = (u32)current_dol_buf;
-    prog_dst = (u32)&_start; // (u32*)0x80600000;
+    prog_dst = (u32)get_start_addr(); // (u32*)0x80600000;
     prog_len = current_dol_len;
 
     iprintf("Current program start = %08x\n", prog_entrypoint);
