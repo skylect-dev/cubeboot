@@ -11,7 +11,7 @@
 #include <ogc/aram.h>
 #include <ogc/cache.h>
 #include <ogc/gx.h>
-extern void __lwp_thread_stopmultitasking(void (*)(void));
+#include <ogc/machine/processor.h>
 #include <ogc/system.h>
 
 #include "sidestep.h"
@@ -165,7 +165,10 @@ void ARAMRun(u32 entrypoint, u32 dst, u32 src, u32 len)
 	*(volatile u32*)0x800000C0 = osctxphys;
 	*(volatile u32*)0x800000D4 = osctxvirt;
 	/*** Shutdown all threads and exit to this method ***/
-	__lwp_thread_stopmultitasking((void(*)())ARAMRunStub());
+	u32 level;
+	_CPU_ISR_Disable(level);
+	void (*entry)() = (void(*)())ARAMRunStub();
+	entry();
 }
 
 /****************************************************************************

@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 #include <asndlib.h>
-extern void __lwp_thread_stopmultitasking(void (*)(void));
+#include <ogc/machine/processor.h>
 #include <ogc/lwp_watchdog.h>
 
 #include <stddef.h>
@@ -399,7 +399,9 @@ int main() {
     u64 runtime = endts - startts;
     iprintf("Runtime = %llu\n", runtime);
 
-    __lwp_thread_stopmultitasking(bs2entry);
+    u32 level;
+    _CPU_ISR_Disable(level);
+    bs2entry();
 
     __builtin_unreachable();
 }

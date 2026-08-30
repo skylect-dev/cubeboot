@@ -41,6 +41,7 @@ distribution.
 #include <ogc/cache.h>
 #include <ogc/lwp.h>
 
+#include <ogc/lwp_watchdog.h>
 #include <ogc/irq.h>
 #include <ogcsys.h>
 #include <ogc/system.h>
@@ -397,8 +398,6 @@ static s32 GCODE_LowSetOffset(s64 offset,gcodecallbacklow cb);
 static s32 GCODE_GcodeLowRead(void *buf,u32 len,u32 offset,gcodecallbacklow cb);
 
 extern void udelay(int us);
-extern u32 diff_msec(unsigned long long start,unsigned long long end);
-extern long long gettime(void);
 extern void __MaskIrq(u32);
 extern void __UnmaskIrq(u32);
 extern syssramex* __SYS_LockSramEx(void);
