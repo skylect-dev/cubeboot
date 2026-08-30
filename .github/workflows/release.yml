@@ -1,0 +1,71 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version string (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container: devkitpro/devkitppc:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup
+        run: |
+          apt-get update && apt-get install -y genisoimage nodejs build-essential gcc-arm-none-eabi python3-pip
+          pip3 install --break-system-packages -r patches/scripts/requirements.txt || pip3 install -r patches/scripts/requirements.txt
+      
+      - name: Build cubeboot
+        run: cd entry; make clean && make
+      
+      - name: Build apploader
+        run: |
+          git clone -b force-early-boot --single-branch https://github.com/OffBroadway/gc-boot-tools.git
+          cd gc-boot-tools
+          sed -i '1i void _memset(void* s, int c, int count);' ppc/apploader/apploader.c
+          (cd ppc/apploader; make)
+          (cd mkgbi; make)
+          ls mkgbi/gbi.hdr
+      
+      - name: Build GCLoader
+        run: |
+          mkdir boot-dir && cp cubeboot/cubeboot.dol boot-dir
+          genisoimage -R -J -G gc-boot-tools/mkgbi/gbi.hdr -no-emul-boot -b cubeboot.dol -o boot.iso boot-dir
+      
+      - name: Build PicoBoot
+        run: |
+          git clone https://github.com/webhdx/PicoBoot.git
+          cd PicoBoot
+          git checkout 4bc1bfd22d8e9ce0a0fcd57e77b50801565566ed
+          env PICO_SDK_FETCH_FROM_GIT=1 cmake .
+          ./process_ipl.py ../entry/entry.dol src/ipl.h
+          make
+      
+      - name: Organize Artifacts
+        run: |
+          mkdir -p dist/release
+          mv ./boot.iso dist/release/boot.iso
+          mv ./cubeboot/cubeboot.dol dist/release/cubeboot.dol
+          mv ./PicoBoot/picoboot.uf2 dist/release/cubeboot.uf2
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
+          name: Release ${{ github.event.inputs.version || github.ref_name }}
+          files: |
+            dist/release/boot.iso
+            dist/release/cubeboot.dol
+            dist/release/cubeboot.uf2
+          draft: false
+          prerelease: false
