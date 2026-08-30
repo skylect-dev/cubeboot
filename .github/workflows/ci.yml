@@ -3,15 +3,14 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: devkitpro/devkitppc:20220821
+    container: devkitpro/devkitppc:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup
         run: |
-          apt-get update && apt-get install -y genisoimage nodejs build-essential gcc-arm-none-eabi python3-distutils python3-setuptools
-          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py
-          pip3 install -r patches/scripts/requirements.txt
+          apt-get update && apt-get install -y genisoimage nodejs build-essential gcc-arm-none-eabi python3-pip
+          pip3 install --break-system-packages -r patches/scripts/requirements.txt || pip3 install -r patches/scripts/requirements.txt
       - name: Build cubeboot
         run: cd entry; make clean && make
       - name: Build apploader
